@@ -1,0 +1,74 @@
+**Pseudocode for QPCR Analysis Script**
+
+**Purpose:**
+- Calculate Delta Ct, Delta Delta Ct, fold changes, and p-values for QPCR results.
+
+---
+
+**1. Import Required Libraries**
+- Import argparse for command-line argument parsing
+- Import necessary modules: sys, os, numpy, pandas, scipy.stats, itertools
+
+**2. Define `parse_cli()` Function**
+- Create argument parser
+- Define command-line arguments:
+  - Input file(s)
+  - Sheet name
+  - Internal control gene
+  - Experimental control group
+  - Output file name
+  - Calculation mode
+  - Standard deviation threshold
+  - Header row
+  - Tail rows
+- Parse and return arguments
+
+**3. Define `read_input(args)` Function**
+- Check if file exists, else exit with an error
+- Read file based on its format (Excel, CSV, TXT)
+- Rename columns if necessary
+- Validate experimental and internal controls
+- Convert undetermined values to NaN
+- Return processed data
+
+**4. Define `parse_input(args)` Function**
+- Split multi-file input
+- Read and store each file’s data
+- Validate standard deviation value
+- Return parsed arguments with grouped data
+
+**5. Define Helper Functions**
+- `reject_outliers(data, m=2.0)`: Remove outliers based on median absolute deviation
+- `min_mean(arr, std=0.5)`: Compute mean while rejecting outliers
+- `min_mean2(arr, std=0.5)`: Alternative method for mean calculation
+- `stars(p)`: Assign statistical significance symbols based on p-values
+- `ttest(arr1, arr2)`: Perform t-test between two datasets
+- `reshape(df)`: Restructure dataframe for analysis
+
+**6. Define `run(args)` Function**
+- Validate required inputs
+- Run appropriate mode:
+  - `bioRep`: Compute mean Delta Ct
+  - `techRep`: Use only first replicate entry
+  - `dropOut`: Remove outliers and recalculate mean Ct
+  - `stat`: Perform statistical testing
+- Call respective computation functions
+
+**7. Define `calc_fc(args, df, return_df=False)` Function**
+- Compute Delta Ct for each sample relative to internal control
+- Compute Delta Delta Ct relative to experimental control
+- Calculate fold changes using 2^(-Delta Delta Ct)
+- Save results to CSV file
+
+**8. Define `calc_stats(args, return_df=False)` Function**
+- Compute Delta Ct and Delta Delta Ct with biological replicates
+- Compute fold changes
+- Perform statistical t-tests comparing experimental groups
+- Save results to an Excel file
+
+**9. Execute Script in Main Block**
+- Parse command-line arguments
+- Print input parameters
+- Run the analysis pipeline
+- Print success message
+
